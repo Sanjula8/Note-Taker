@@ -1,6 +1,7 @@
 var express = require("express");
 var path = require("path");
-var fs = require("fs");
+
+var storage = require("./db/storage");
 
 const app = express();
 const PORT = process.env.PORT || 8080;
@@ -22,12 +23,8 @@ app.get("/notes", function(req, res) {
 
 // Get API Routes:
 
-let storedNotes = require("./db/db.json");
-// let notesArray = JSON.parse(storedNotes);
-
 app.get("/api/notes", function(req, res) {
-	res.json(storedNotes);
-	console.log(storedNotes);
+	storage.getNotes().then(notes => res.json(notes));
 });
 
 app.get("*", function(req, res) {
@@ -36,16 +33,9 @@ app.get("*", function(req, res) {
 
 app.post("/api/notes", function(req, res) {
 	var newNote = req.body;
-	storedNotes.push;
-	res.json(newNote);
+	storage.addNote(newNote).then(note => res.json(note));
 });
 
-// var newCharacter = req.body;
-
-// newCharacter.routeName = newCharacter.name.replace(/\s+/g, "").toLowerCase();
-
-// console.log(newCharacter);
-
-// characters.push(newCharacter);
-
-// res.json(newCharacter);
+app.delete("/api/notes/:id", function(req, res) {
+	storage.removeNote(req.params.id).then(() => res.json({ ok: true }));
+});
